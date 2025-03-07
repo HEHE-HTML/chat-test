@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Sign Up/In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #auth-container {
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        input, button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+        }
+        #chat {
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .message {
+            font-weight: bold;
+        }
+        .typing {
+            font-style: italic;
+            color: gray;
+        }
+        li.other-user {
+            background-color: #e0e0e0;
+        }
+        li.my-message {
+            background-color: #add8e6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="auth-container">
+    <h2>Sign Up / Sign In</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button id="signup-btn">Sign Up</button>
+    <button id="signin-btn">Sign In</button>
+    <p id="auth-error" class="error"></p>
+</div>
+
+<div id="chat">
+    <ul id="messages"></ul>
+    <div id="typing" class="typing" style="display: none;"></div>
+    <form id="form" action="">
+        <input id="input" autocomplete="off" placeholder="Type a message...">
+        <button>Send</button>
+    </form>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const authContainer = document.getElementById('auth-container');
+    const chatContainer = document.getElementById('chat');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const signupBtn = document.getElementById('signup-btn');
+    const signinBtn = document.getElementById('signin-btn');
+    const authError = document.getElementById('auth-error');
+
+    let username = '';
+
+    signupBtn.addEventListener('click', () => {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        socket.emit('signup', { username, password });
+    });
+
+    signinBtn.addEventListener('click', () => {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        socket.emit('signin', { username, password });
+    });
+
+    socket.on('auth-success', (name) => {
+        authContainer.style.display = 'none';
+        chatContainer.style.display = 'flex';
+        username = name;
+    });
+
+    socket.on('auth-error', (message) => {
+        authError.textContent = message;
+    });
+
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messagesList = document.getElementById('messages');
+    const typingIndicator = document.getElementById('typing');
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (input.value) {
+            socket.emit('chat message', input.value);
+            input.value = '';
+        }
+    });
+
+    socket.on('chat message', ({ username, msg, timestamp }) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="message">${username}:</span> ${msg} <span style="font-size: 0.8em; color: gray;">(${timestamp})</span>`;
+
+        if (username === this.username) {
+            li.classList.add('my-message');
+        } else {
+            li.classList.add('other-user');
+        }
+
+        messagesList.appendChild(li);
+        messagesList.scrollTop = messagesList.scrollHeight;
+    });
+
+    socket.on('typing', (name) => {
+        typingIndicator.textContent = `${name} is typing...`;
+        typingIndicator.style.display = 'block';
+        setTimeout(() => {
+            typingIndicator.style.display = 'none';
+        }, 2000);
+    });
+
+    input.addEventListener('input', () => {
+        socket.emit('typing', username);
+    });
+</script>
+
+</body>
+</html>
