@@ -18,8 +18,8 @@
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <div class="button-group">
-            <button id="signup-btn">Sign Up</button>
-            <button id="signin-btn">Sign In</button>
+            <button  class = "red-button"id="signup-btn">Sign Up</button>
+            <button  class = "red-button"id="signin-btn">Sign In</button>
         </div>
         <p id="auth-error" class="error"></p>
     </div>
@@ -30,8 +30,8 @@
         <h1>Bulldog Beef</h1>
         <div class="user-controls">
             <span id="current-user"></span>
-            <button id="upload-btn">Upload Image</button>
-            <button id="logout-btn">Logout</button>
+            <button class = "red-button" id="upload-btn">Upload Image</button>
+            <button class = "red-button" id="logout-btn">Logout</button>
         </div>
     </header>
 
@@ -58,7 +58,7 @@
             <div id="typing" class="typing" style="display: none;"></div>
             <form id="comment-form">
                 <input id="comment-input" autocomplete="off" placeholder="Roast this...">
-                <button type="submit">Burn</button>
+                <button  class = "red-button"type="submit">Burn</button>
             </form>
         </div>
     </div>
@@ -73,9 +73,11 @@
             </form>
         </div>
     </div>
+
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="client.js"></script>
+
 </body>
 </html>

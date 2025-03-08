@@ -102,9 +102,10 @@ button:active {
     transform: translateY(1px);
     box-shadow: 0 2px 10px rgba(255, 51, 51, 0.3);
 }
+
 .slogan {
-    font-size: 1.5em; /* Slightly large text */
-    color: white; /* White text color */
+    font-size: 1.5em;
+    color: white;
 }
 
 .error {
@@ -159,6 +160,7 @@ header h1 {
     align-items: center;
     gap: 20px;
 }
+
 /* Fire button styles */
 .fire-button {
     cursor: pointer;
@@ -195,6 +197,7 @@ header h1 {
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
+
 #current-user {
     font-weight: bold;
     margin-right: 8px;
@@ -255,7 +258,6 @@ header button {
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-
 #current-image {
     position: relative;
 }
@@ -297,9 +299,9 @@ header button {
 }
 
 #next-image {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    width: 80px; /* Adjust width as needed */
+    height: 40px; /* Adjust height as needed */
+    border-radius: 8px; /* Remove or reduce to make it more rectangular */
     font-size: 1.5rem;
     display: flex;
     justify-content: center;
@@ -307,17 +309,24 @@ header button {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #ff3333, #cc0000);
-    color: white; /* White text color */
+    color: white;
     text-align: center;
     transition: all 0.3s ease;
 }
 
 #next-image:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 12px rgba(255, 51, 51, 0.7); /* Add a glowing red shadow instead */
-    border-bottom: 2px solid #ff3333; /* Add a red outline at the bottom */
+    transform: scale(1.05); /* Slightly reduce the scale effect */
+    box-shadow: 0 0 12px rgba(255, 51, 51, 0.7);
+    border-bottom: 2px solid #ff3333;
 }
 
+/* Touch target size adjustments for mobile (if needed) */
+@media (max-width: 767px) {
+    #next-image {
+        width: 60px; /* Adjust for mobile if needed */
+        height: 35px; /* Adjust for mobile if needed */
+    }
+}
 
 /* Comments Section */
 #comments-section {
@@ -335,16 +344,17 @@ header button {
     font-size: 1.5rem;
     color: #ff3333;
 }
-.choose-file{
+
+.choose-file {
     
 }
+
 #comments-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
     max-height: 500px;
     overflow-y: auto;
-    
     scrollbar-width: thin;
     scrollbar-color: #444 #222;
 }
@@ -374,7 +384,9 @@ header button {
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     word-wrap: break-word;
-    overflow-wrap: normal;
+    overflow-wrap: break-word; /* Changed from "normal" to "break-word" */
+    word-break: break-word; /* Add this line */
+    white-space: normal; /* Add this line */
 }
 
 .comment.other-user {
@@ -433,6 +445,12 @@ header button {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+
+#comment-input:focus {
+    border-color: #ff3333;
+    box-shadow: 0 0 8px rgba(255, 51, 51, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
 #comment-form button {
     width: auto;
     margin-bottom: 0;
@@ -449,7 +467,7 @@ header button {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(0px);
     transition: all 0.3s ease;
 }
 
@@ -461,7 +479,7 @@ header button {
     max-width: 500px;
     border-radius: 12px;
     position: relative;
-    box-shadow: 0 15px 50px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transform: translateY(0);
     animation: modalAppear 0.3s ease;
@@ -508,6 +526,7 @@ header button {
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 }
+
 .fire-button {
     cursor: pointer;
     margin-left: 10px;
@@ -542,12 +561,6 @@ header button {
     animation: fire-pulse 0.3s ease;
 }
 
-@keyframes fire-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
 .comment-content {
     display: flex;
     justify-content: space-between;
@@ -558,6 +571,7 @@ header button {
 .comment-text-container {
     flex-grow: 1;
 }
+
 .logo-container h1,
 .slogan,
 .error,
@@ -570,5 +584,843 @@ header,
 #next-image,
 .comment,
 .modal-content {
-    transition: all 0.3s ease; /* Add transition to elements that move or scale */
+    transition: all 0.3s ease;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 767px) {
+    .logo-container h1 {
+        font-size: 2.8rem;
+    }
+    
+    .user-controls {
+        gap: 10px;
+    }
+    
+    header {
+        padding: 12px 15px;
+    }
+    
+    header h1 {
+        font-size: 1.7rem;
+    }
+    
+    #current-user {
+        font-size: 0.8em;
+        padding: 6px 10px;
+    }
+    
+    header button {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    
+    #comments-section {
+        padding: 15px;
+    }
+    
+    #swipe-instructions p {
+        font-size: 0.8em;
+    }
+    
+    #comment-form button {
+        padding: 12px 15px;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        margin: 15% auto;
+        width: 90%;
+    }
+
+    #image-info {
+        padding: 15px 10px 10px;
+    }
+
+    #comments-list {
+        max-height: 300px;
+    }
+
+    #upload-form input[type="file"] {
+        width: 100%;
+    }
+
+    /* Make sure the buttons in auth container don't break on small screens */
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+}
+
+/* Touch target size adjustments for mobile */
+@media (max-width: 767px) {
+    input, button, .close, #next-image {
+        min-height: 44px; /* Apple's recommended minimum touch target size */
+    }
+    
+    #next-image {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .close {
+        padding: 8px;
+    }
+}
+/* Notification System */
+#notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    background-color: #1a1a1a;
+    border-left: 3px solid #ff3333;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.notification:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.notification-content {
+    flex-grow: 1;
+    padding-right: 10px;
+}
+
+.notification-title {
+    font-weight: bold;
+    color: #ff3333;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    color: #e0e0e0;
+    font-size: 0.9em;
+}
+
+.notification-close {
+    color: #999;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0 5px;
+}
+
+.notification-close:hover {
+    color: #ff3333;
+    transform: scale(1.2);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@media (max-width: 767px) {
+    #notification-container {
+        bottom: 10px;
+        right: 10px;
+        max-width: 250px;
+    }
+    
+    .notification {
+        padding: 12px;
+    }
+    
+    .notification-title {
+        font-size: 0.9em;
+    }
+    
+    .notification-message {
+        font-size: 0.8em;
+    }
+}
+#profile-container {
+    background-color: #222;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    display: none; /* Hidden by default, shown when profile is viewed */
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #ff5a00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    margin-right: 15px;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-username {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.profile-rank {
+    color: #ff5a00;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    background-color: #333;
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff5a00;
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0;
+}
+
+/* Badges section */
+.badges-container {
+    margin-top: 20px;
+}
+
+.badges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.badge {
+    background-color: #333;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+    background-color: #444;
+}
+
+.badge-icon {
+    background-color: #ff5a00;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+}
+
+.badge-icon.locked {
+    background-color: #555;
+    opacity: 0.6;
+}
+
+.badge-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge-description {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+/* Badge notification */
+.badge-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #222;
+    border: 2px solid #ff5a00;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: slideIn 0.3s forwards;
+    max-width: 300px;
+    display: none; /* Shown via JS when badge is earned */
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.badge-notification-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.badge-notification-icon {
+    background-color: #ff5a00;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.badge-notification-text {
+    flex: 1;
+}
+
+.badge-notification-title {
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+}
+
+.badge-notification-desc {
+    font-size: 12px;
+    color: #ccc;
+    margin: 3px 0 0;
+}
+
+/* Leaderboard modal */
+#leaderboard-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.leaderboard-content {
+    background-color: #222;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    color: #fff;
+    position: relative;
+}
+
+.leaderboard-title {
+    text-align: center;
+    color: #ff5a00;
+    margin-bottom: 20px;
+}
+
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    margin-bottom: 8px;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.leaderboard-rank {
+    font-size: 18px;
+    font-weight: bold;
+    width: 30px;
+    text-align: center;
+}
+
+.leaderboard-rank.top-1 {
+    color: gold;
+}
+
+.leaderboard-rank.top-2 {
+    color: silver;
+}
+
+.leaderboard-rank.top-3 {
+    color: #cd7f32; /* bronze */
+}
+
+.leaderboard-user {
+    flex: 1;
+    margin-left: 10px;
+}
+
+.leaderboard-username {
+    font-weight: bold;
+}
+
+.leaderboard-user-rank {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.leaderboard-score {
+    font-weight: bold;
+    color: #ff5a00;
+}
+
+.leaderboard-badges {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.leaderboard-badge-count {
+    background-color: #ff5a00;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+/* Profile button in header */
+.user-controls {
+    display: flex;
+    align-items: center;
+}
+
+#profile-btn {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#profile-btn:hover {
+    background-color: #555;
+}
+
+#leaderboard-btn {
+    background-color: #ff5a00;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#leaderboard-btn:hover {
+    background-color: #ff7a30;
+}
+
+/* Comment badge indicators */
+.comment-with-badge {
+    position: relative;
+}
+
+.comment-badge-icon {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #ff5a00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+
+}
+
+/* Profile container tabs */
+.profile-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.profile-tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-right: 10px;
+}
+
+.profile-tab.active {
+    border-bottom-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.profile-tab-content {
+    display: none;
+}
+
+.profile-tab-content.active {
+    display: block;
+}
+
+/* User images gallery in profile */
+.user-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.user-image-item {
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.user-image-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.user-image-stats {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .badges-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .user-images-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .user-images-grid {
+        grid-template-columns: 1fr;
+    }
+}/* ... (your existing CSS) ... */
+
+#bottom-left-buttons {
+    position: fixed;
+    bottom: -5px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+#profile-btn, #badges-btn {
+    background-color: #992222;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#profile-btn:hover, #badges-btn:hover {
+    background-color: #b52727;
+    transform: translateY(-2px);
+}
+
+/* Profile Modal Styles */
+.profile-modal-content, .badges-modal-content {
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #252525;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    background-color: #992222;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-between;
+    background-color: #303030;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.profile-badges-preview {
+    background-color: #303030;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.profile-badges-preview h3, .profile-activity h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #ddd;
+}
+
+.badges-preview-container {
+    display: flex;
+    gap: 10px;
+}
+
+.badge-preview {
+    width: 50px;
+    height: 50px;
+    background-color: #252525;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.profile-activity {
+    background-color: #303030;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.activity-bar-container {
+    margin-bottom: 15px;
+}
+
+.activity-label {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.activity-bar {
+    height: 10px;
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.activity-progress {
+    height: 100%;
+    background-color: #992222;
+    border-radius: 5px;
+}
+
+/* Badges Styles */
+#badges-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.badge-card {
+    background-color: #303030;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+
+
+.badge-card.earned {
+    border: 2px solid #992222;
+}
+
+.badge-card.locked {
+    opacity: 0.7;
+    filter: grayscale(50%);
+}
+
+.badge-card .badge-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.badge-info {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.badge-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.badge-description {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.badge-status {
+    font-size: 12px;
+    font-weight: bold;
+    color: #992222;
+    margin-top: 5px;
+}
+
+.badge-card.locked .badge-status {
+    color: #777;
+}
+
+/* Make sure the modal styles work with the new modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

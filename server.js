@@ -12,6 +12,8 @@ const users = new Map();
 const images = [];
 const comments = new Map(); // Map of image ID to array of comments
 const firedComments = new Map(); // Map to track fired comments by users
+const userStats = new Map(); // Map to store user statistics
+const userBadges = new Map(); // Map to store user badges
 
 app.use(express.static(__dirname));
 
@@ -21,6 +23,7 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('A user connected');
+    
     // Auth handlers
     socket.on('signup', ({ username, password }) => {
         if (users.has(username)) {
@@ -28,6 +31,16 @@ io.on('connection', (socket) => {
         } else {
             users.set(username, password);
             socket.username = username;
+            
+            // Initialize user stats and badges
+            userStats.set(username, {
+                imagesUploaded: 0,
+                commentsPosted: 0,
+                firesReceived: 0,
+                firesGiven: 0
+            });
+            userBadges.set(username, []);
+            
             socket.emit('auth-success', username);
         }
     });
@@ -38,6 +51,46 @@ io.on('connection', (socket) => {
             socket.emit('auth-success', username);
         } else {
             socket.emit('auth-error', 'Invalid username or password.');
+        }
+    });
+
+    // User stats and badges handlers
+    socket.on('get user stats', (username) => {
+        if (userStats.has(username)) {
+            socket.emit('user stats', userStats.get(username));
+        } else {
+            // Create default stats if they don't exist
+            const defaultStats = {
+                imagesUploaded: 0,
+                commentsPosted: 0,
+                firesReceived: 0,
+                firesGiven: 0
+            };
+            userStats.set(username, defaultStats);
+            socket.emit('user stats', defaultStats);
+        }
+    });
+
+    socket.on('get user badges', (username) => {
+        if (userBadges.has(username)) {
+            socket.emit('user badges', userBadges.get(username));
+        } else {
+            // Create empty badges array if it doesn't exist
+            userBadges.set(username, []);
+            socket.emit('user badges', []);
+        }
+    });
+
+    socket.on('save badge', ({ username, badge }) => {
+        if (!userBadges.has(username)) {
+            userBadges.set(username, []);
+        }
+        
+        // Check if badge already exists
+        const badges = userBadges.get(username);
+        if (!badges.some(b => b.id === badge.id)) {
+            badges.push(badge);
+            userBadges.set(username, badges);
         }
     });
 
@@ -58,6 +111,16 @@ io.on('connection', (socket) => {
         images.push(newImage);
         comments.set(imageId, []);
         
+        // Increment user's uploaded images count
+        if (userStats.has(socket.username)) {
+            const stats = userStats.get(socket.username);
+            stats.imagesUploaded++;
+            userStats.set(socket.username, stats);
+            
+            // Send updated stats to client
+            socket.emit('user stats', stats);
+        }
+        
         io.emit('new image', newImage);
     });
 
@@ -77,7 +140,7 @@ io.on('connection', (socket) => {
             username: socket.username,
             text: comment,
             timestamp: new Date().toLocaleString(),
-            fireCount: 0 // Initialize fire count to 0
+            fireCount: 0
         };
         
         if (!comments.has(imageId)) {
@@ -85,6 +148,17 @@ io.on('connection', (socket) => {
         }
         
         comments.get(imageId).push(newComment);
+        
+        // Increment user's comments posted count
+        if (userStats.has(socket.username)) {
+            const stats = userStats.get(socket.username);
+            stats.commentsPosted++;
+            userStats.set(socket.username, stats);
+            
+            // Send updated stats to client
+            socket.emit('user stats', stats);
+        }
+        
         io.emit('new comment', newComment);
     });
 
@@ -111,6 +185,29 @@ io.on('connection', (socket) => {
                     
                     // Increment the fire count
                     comment.fireCount += 1;
+                    
+                    // Update stats for both users - the one giving the fire and the one receiving it
+                    if (userStats.has(socket.username)) {
+                        const giverStats = userStats.get(socket.username);
+                        giverStats.firesGiven++;
+                        userStats.set(socket.username, giverStats);
+                        
+                        // Send updated stats to client
+                        socket.emit('user stats', giverStats);
+                    }
+                    
+                    if (userStats.has(comment.username)) {
+                        const receiverStats = userStats.get(comment.username);
+                        receiverStats.firesReceived++;
+                        userStats.set(comment.username, receiverStats);
+                        
+                        // Notify the comment owner if they're online
+                        io.sockets.sockets.forEach(s => {
+                            if (s.username === comment.username) {
+                                s.emit('user stats', receiverStats);
+                            }
+                        });
+                    }
                     
                     // Broadcast the updated fire count to all clients
                     io.emit('comment fired', {
