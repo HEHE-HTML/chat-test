@@ -1,0 +1,14 @@
+{
+    "name": "bulldog-beef",
+    "version": "1.0.0",
+    "description": "A social media platform for roasting images",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "socket.io": "^4.4.1",
+      "uuid": "^8.3.2"
+    }
+  }
