@@ -7,78 +7,71 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<div id="auth-container">
-    <div class="logo-container">
-        <h1>Bulldog Beef</h1>
-        <p class="slogan">Upload. Roast. Repeat.</p>
-    </div>
-    <div class="form-container">
-        <h2>Sign Up / Sign In</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <div class="button-group">
-            <button  class = "red-button"id="signup-btn">Sign Up</button>
-            <button  class = "red-button"id="signin-btn">Sign In</button>
+    <div id="auth-container">
+        <div class="logo-container">
+            <h1>Bulldog Beef</h1>
+            <p class="slogan">Upload. Roast. Repeat.</p>
         </div>
-        <p id="auth-error" class="error"></p>
-    </div>
-</div>
-
-<div id="main-container">
-    <header>
-        <h1>Bulldog Beef</h1>
-        <div class="user-controls">
-            <span id="current-user"></span>
-            <button class = "red-button" id="upload-btn">Upload Image</button>
-            <button class = "red-button" id="logout-btn">Logout</button>
+        <div class="form-container">
+            <h2>Sign Up / Sign In</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <div class="button-group">
+                <button class="red-button" id="signup-btn">Sign Up</button>
+                <button class="red-button" id="signin-btn">Sign In</button>
+            </div>
+            <p id="auth-error" class="error"></p>
         </div>
-    </header>
+    </div>
 
-    <div id="content">
-        <div id="image-container">
-            <div id="image-card">
-                <div id="current-image">
-                    <img id="roast-image" src="placeholder.png" alt="Image to roast">
-                    <div id="image-info">
-                        <span id="image-uploader"></span>
-                        <span id="image-timestamp"></span>
+    <div id="main-container">
+        <header>
+            <h1>Bulldog Beef</h1>
+            <div class="user-controls">
+                <span id="current-user"></span>
+                <button class="red-button" id="upload-btn">Upload Image</button>
+                <button class="red-button" id="logout-btn">Logout</button>
+            </div>
+        </header>
+
+        <div id="content">
+            <div id="image-container">
+                <div id="image-card">
+                    <div id="current-image">
+                        <img id="roast-image" src="placeholder.png" alt="Image to roast">
+                        <div id="image-info">
+                            <span id="image-uploader"></span>
+                            <span id="image-timestamp"></span>
+                        </div>
+                    </div>
+                    <div id="swipe-instructions">
+                        <p>Click the arrow to see the next image</p>
+                        <button id="next-image">></button>
                     </div>
                 </div>
-                <div id="swipe-instructions">
-                    <p>Click the arrow to see the next image</p>
-                    <button id="next-image">></button>
-                </div>
+            </div>
+
+            <div id="comments-section">
+                <h3>Roasts</h3>
+                <ul id="comments-list"></ul>
+                <form id="comment-form">
+                    <input id="comment-input" autocomplete="off" placeholder="Roast this...">
+                    <button class="red-button" type="submit">Burn</button>
+                </form>
             </div>
         </div>
 
-        <div id="comments-section">
-            <h3>Roasts</h3>
-            <ul id="comments-list"></ul>
-            <!-- <div id="typing" class="typing" style="display: none;"></div> -->
-            <form id="comment-form">
-                <input id="comment-input" autocomplete="off" placeholder="Roast this...">
-                <button  class = "red-button"type="submit">Burn</button>
-            </form>
+        <div id="upload-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Upload an Image to Roast</h2>
+                <form id="upload-form">
+                    <input type="file" id="image-input" accept="image/*" capture="user">
+                </form>
+            </div>
         </div>
     </div>
-
-    <div id="upload-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Upload an Image to Roast</h2>
-            <form id="upload-form">
-                <input type="file" id="image-input" accept="image/*" capture="user">
-
-            </form>
-            
-        </div>
-    </div>
-
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="client.js"></script>
-
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
 </body>
 </html>

@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 app.get('/ping', (req, res) => {
+    console.log('Ping received from client');
     res.send('pong');
 });
 io.on('connection', (socket) => {

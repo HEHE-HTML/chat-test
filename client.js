@@ -5,17 +5,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     // Ping function to keep connection alive
     function startPing() {
+        console.log('Starting ping service...');
         setInterval(() => {
+            console.log('Sending ping to server...');
             fetch('/ping')
                 .then(response => {
                     if (!response.ok) {
                         console.error('Ping failed:', response.status);
+                    } else {
+                        console.log('Ping successful');
                     }
                 })
                 .catch(error => {
                     console.error('Error during ping:', error);
                 });
-        }, 5 * 60 * 500); // Ping every 5 minutes
+        }, 60 * 300); // Ping every 1 minute
     }
 
     startPing(); // Start the pinging process
