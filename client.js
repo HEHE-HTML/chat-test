@@ -391,37 +391,75 @@ const availableBadges = [
             uploadModal.style.display = 'none';
         }
     });
-    uploadForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const file = imageInput.files[0];
-        if (!file) {
-            alert('Please select an image to upload');
-            return;
-        }
-        
-        // Add file type validation
-        if (!file.type.match('image.*')) {
-            alert('Please select an image file (JPEG, PNG, etc.)');
-            return;
-        }
-        
-        // Add size validation (e.g., 5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Image size should be less than 5MB');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = () => { // Changed from onloadend to onload
-            socket.emit('upload image', reader.result);
+uploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const file = imageInput.files[0];
+    if (!file) {
+        alert('Please select an image to upload');
+        return;
+    }
+    
+    // Add file type validation
+    if (!file.type.match('image.*')) {
+        alert('Please select an image file (JPEG, PNG, etc.)');
+        return;
+    }
+    
+    // Add size validation (e.g., 5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+    }
+    
+    // Show loading indicator
+    const submitButton = uploadForm.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.textContent = 'Uploading...';
+    submitButton.disabled = true;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        try {
+            socket.emit('upload image', event.target.result);
             uploadModal.style.display = 'none';
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Error uploading image. Please try again.');
+        } finally {
+            // Reset form and button state
             imageInput.value = '';
-        };
-        reader.onerror = () => {
-            alert('Error reading file. Please try again.');
-        };
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        }
+    };
+    
+    reader.onerror = function() {
+        console.error('FileReader error:', reader.error);
+        alert('Error reading file. Please try again.');
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+    };
+    
+    // Add timeout for large files
+    setTimeout(() => {
+        if (reader.readyState !== 2) { // DONE state
+            reader.abort();
+            alert('Upload timed out. Please try with a smaller image.');
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        }
+    }, 30000); // 30 second timeout
+    
+    try {
         reader.readAsDataURL(file);
-    });
+    } catch (error) {
+        console.error('Error starting file read:', error);
+        alert('Could not process the selected file. Please try another image.');
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+    }
+});
 
     // Socket event handlers
     socket.on('auth-success', (username) => {
