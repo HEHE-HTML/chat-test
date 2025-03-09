@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Extract file upload logic to a separate function
+    // Extract file upload logic to a separate function - MODIFIED to remove size limit
     function handleFileUpload() {
         const file = imageInput.files[0];
         if (!file) {
@@ -432,11 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Add size validation (e.g., 5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Image size should be less than 5MB');
-            return;
-        }
+        // Size validation removed to allow any size
         
         // Show loading indicator
         const submitButton = uploadForm.querySelector('button[type="submit"]');
@@ -468,15 +464,15 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.disabled = false;
         };
         
-        // Add timeout for large files
+        // Increased timeout for large files
         setTimeout(() => {
             if (reader.readyState !== 2) { // DONE state
                 reader.abort();
-                alert('Upload timed out. Please try with a smaller image.');
+                alert('Upload timed out. The image might be too large to process.');
                 submitButton.textContent = originalButtonText;
                 submitButton.disabled = false;
             }
-        }, 30000); // 30 second timeout
+        }, 120000); // Extended timeout to 2 minutes
         
         try {
             reader.readAsDataURL(file);
