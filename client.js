@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => {
                     if (!response.ok) {
                         console.error('Ping failed:', response.status);
+                        
                     }
                 })
                 .catch(error => {
@@ -390,18 +391,11 @@ const availableBadges = [
             uploadModal.style.display = 'none';
         }
     });
-
     uploadForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const file = imageInput.files[0];
         if (!file) {
             alert('Please select an image to upload');
-            return;
-        }
-    
-        // Check file size (limit to 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('File size exceeds 5MB. Please choose a smaller image.');
             return;
         }
     
@@ -552,18 +546,20 @@ const availableBadges = [
         }
     });
     
-    socket.on('user typing', (data) => {
-        if (data.imageId === images[currentImageIndex].id && data.username !== currentUsername) {
-            typingIndicator.textContent = `${data.username} is typing...`;
-            typingIndicator.style.display = 'block';
+    // socket.on('user typing', (data) => {
+    //     // Remove this entire block
+    //     if (data.imageId === images[currentImageIndex].id && data.username !== currentUsername) {
+    //         typingIndicator.textContent = `${data.username} is typing...`;
+    //         typingIndicator.style.display = 'block';
             
-            // Clear typing indicator after 2 seconds of inactivity
-            clearTimeout(window.typingTimeout);
-            window.typingTimeout = setTimeout(() => {
-                typingIndicator.style.display = 'none';
-            }, 2000);
-        }
-    });
+    //         // Clear typing indicator after 2 seconds of inactivity
+    //         clearTimeout(window.typingTimeout);
+    //         window.typingTimeout = setTimeout(() => {
+    //             typingIndicator.style.display = 'none';
+    //         }, 2000);
+    //     }
+    // });
+    
 })
 
 
