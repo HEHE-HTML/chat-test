@@ -50,20 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close');
     const uploadForm = document.getElementById('upload-form');
     const imageInput = document.getElementById('image-input');
+    const submitImageBtn = document.getElementById('submit-image');
 
     // Create notification container and add to body
     const notificationContainer = document.createElement('div');
     notificationContainer.id = 'notification-container';
     document.body.appendChild(notificationContainer);
 
-    const profileBtn = document.getElementById('profile-btn');
-    const badgesBtn = document.getElementById('badges-btn');
-    const profileModal = document.getElementById('profile-modal');
-    const badgesModal = document.getElementById('badges-modal');
-    const closeProfileModal = document.getElementById('close-profile-modal');
-    const closeBadgesModal = document.getElementById('close-badges-modal');
-    const profileContent = document.getElementById('profile-content');
-    const badgesContainer = document.getElementById('badges-container');
     // App state
     let userStats = {
         imagesUploaded: 0,
@@ -73,44 +66,44 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let userBadges = [];
 
-// Define available badges
-const availableBadges = [
-    { 
-        id: 'first-upload', 
-        name: 'First Blood', 
-        description: 'Upload your first image', 
-        icon: '🔥',
-        condition: stats => stats.imagesUploaded >= 1
-    },
-    { 
-        id: 'roast-master', 
-        name: 'Roast Master', 
-        description: 'Post 10 comments', 
-        icon: '🎯',
-        condition: stats => stats.commentsPosted >= 10
-    },
-    { 
-        id: 'fire-starter', 
-        name: 'Fire Starter', 
-        description: 'Give 5 fire reactions', 
-        icon: '⚡',
-        condition: stats => stats.firesGiven >= 5
-    },
-    { 
-        id: 'popular-beef', 
-        name: 'Popular Beef', 
-        description: 'Receive 10 fire reactions on your comments', 
-        icon: '✨',
-        condition: stats => stats.firesReceived >= 10
-    },
-    { 
-        id: 'content-creator', 
-        name: 'Content Creator', 
-        description: 'Upload 5 images', 
-        icon: '📸',
-        condition: stats => stats.imagesUploaded >= 5
-    }
-];
+    // Define available badges
+    const availableBadges = [
+        { 
+            id: 'first-upload', 
+            name: 'First Blood', 
+            description: 'Upload your first image', 
+            icon: '🔥',
+            condition: stats => stats.imagesUploaded >= 1
+        },
+        { 
+            id: 'roast-master', 
+            name: 'Roast Master', 
+            description: 'Post 10 comments', 
+            icon: '🎯',
+            condition: stats => stats.commentsPosted >= 10
+        },
+        { 
+            id: 'fire-starter', 
+            name: 'Fire Starter', 
+            description: 'Give 5 fire reactions', 
+            icon: '⚡',
+            condition: stats => stats.firesGiven >= 5
+        },
+        { 
+            id: 'popular-beef', 
+            name: 'Popular Beef', 
+            description: 'Receive 10 fire reactions on your comments', 
+            icon: '✨',
+            condition: stats => stats.firesReceived >= 10
+        },
+        { 
+            id: 'content-creator', 
+            name: 'Content Creator', 
+            description: 'Upload 5 images', 
+            icon: '📸',
+            condition: stats => stats.imagesUploaded >= 5
+        }
+    ];
 
     let currentUsername = '';
     let images = [];
@@ -133,6 +126,18 @@ const availableBadges = [
     charCounterContainer.style.marginBottom = '5px';
     charCounterContainer.textContent = '0/75';
     commentForm.insertBefore(charCounterContainer, commentForm.firstChild);
+
+    // Detect if running on mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Set appropriate attributes for mobile vs desktop
+    if (isMobile) {
+        imageInput.setAttribute('accept', 'image/*');
+        imageInput.setAttribute('capture', 'camera'); // This triggers the camera on most mobile devices
+    } else {
+        imageInput.setAttribute('accept', 'image/*');
+        // No capture attribute for desktop to ensure file browser opens
+    }
 
     usernameInput.addEventListener('input', () => {
         if (usernameInput.value.length > MAX_USERNAME_LENGTH) {
@@ -391,75 +396,97 @@ const availableBadges = [
             uploadModal.style.display = 'none';
         }
     });
-uploadForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const file = imageInput.files[0];
-    if (!file) {
-        alert('Please select an image to upload');
-        return;
-    }
+
+    // Modified code to automatically trigger file input when submit button is clicked
+    submitImageBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Check if a file has already been selected
+        if (imageInput.files.length > 0) {
+            // If file already selected, proceed with form submission
+            handleFileUpload();
+        } else {
+            // If no file selected, trigger the file input click
+            imageInput.click();
+        }
+    });
     
-    // Add file type validation
-    if (!file.type.match('image.*')) {
-        alert('Please select an image file (JPEG, PNG, etc.)');
-        return;
-    }
+    // Also add a change listener to automatically submit once a file is selected
+    imageInput.addEventListener('change', (e) => {
+        if (imageInput.files.length > 0) {
+            handleFileUpload();
+        }
+    });
     
-    // Add size validation (e.g., 5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB');
-        return;
-    }
-    
-    // Show loading indicator
-    const submitButton = uploadForm.querySelector('button[type="submit"]');
-    const originalButtonText = submitButton.textContent;
-    submitButton.textContent = 'Uploading...';
-    submitButton.disabled = true;
-    
-    const reader = new FileReader();
-    
-    reader.onload = function(event) {
+    // Extract file upload logic to a separate function
+    function handleFileUpload() {
+        const file = imageInput.files[0];
+        if (!file) {
+            alert('Please select an image to upload');
+            return;
+        }
+        
+        // Add file type validation
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPEG, PNG, etc.)');
+            return;
+        }
+        
+        // Add size validation (e.g., 5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+        
+        // Show loading indicator
+        const submitButton = uploadForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Uploading...';
+        submitButton.disabled = true;
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            try {
+                socket.emit('upload image', event.target.result);
+                uploadModal.style.display = 'none';
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Error uploading image. Please try again.');
+            } finally {
+                // Reset form and button state
+                imageInput.value = '';
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        };
+        
+        reader.onerror = function() {
+            console.error('FileReader error:', reader.error);
+            alert('Error reading file. Please try again.');
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        };
+        
+        // Add timeout for large files
+        setTimeout(() => {
+            if (reader.readyState !== 2) { // DONE state
+                reader.abort();
+                alert('Upload timed out. Please try with a smaller image.');
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        }, 30000); // 30 second timeout
+        
         try {
-            socket.emit('upload image', event.target.result);
-            uploadModal.style.display = 'none';
+            reader.readAsDataURL(file);
         } catch (error) {
-            console.error('Upload error:', error);
-            alert('Error uploading image. Please try again.');
-        } finally {
-            // Reset form and button state
-            imageInput.value = '';
+            console.error('Error starting file read:', error);
+            alert('Could not process the selected file. Please try another image.');
             submitButton.textContent = originalButtonText;
             submitButton.disabled = false;
         }
-    };
-    
-    reader.onerror = function() {
-        console.error('FileReader error:', reader.error);
-        alert('Error reading file. Please try again.');
-        submitButton.textContent = originalButtonText;
-        submitButton.disabled = false;
-    };
-    
-    // Add timeout for large files
-    setTimeout(() => {
-        if (reader.readyState !== 2) { // DONE state
-            reader.abort();
-            alert('Upload timed out. Please try with a smaller image.');
-            submitButton.textContent = originalButtonText;
-            submitButton.disabled = false;
-        }
-    }, 30000); // 30 second timeout
-    
-    try {
-        reader.readAsDataURL(file);
-    } catch (error) {
-        console.error('Error starting file read:', error);
-        alert('Could not process the selected file. Please try another image.');
-        submitButton.textContent = originalButtonText;
-        submitButton.disabled = false;
     }
-});
 
     // Socket event handlers
     socket.on('auth-success', (username) => {
@@ -598,11 +625,9 @@ uploadForm.addEventListener('submit', (e) => {
             countSpan.textContent = fireCount;
         }
     });
+    
+    // Touch-specific behavior for upload button
     uploadBtn.addEventListener('touchstart', () => {
         uploadModal.style.display = 'block';
     });
-    
-    // Also make sure the file input is properly styled for mobile
-    imageInput.setAttribute('accept', 'image/*');
-    imageInput.setAttribute('capture', 'camera'); // Optional: allows camera access directly
-})
+});
