@@ -20,7 +20,9 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
-
+app.get('/ping', (req, res) => {
+    res.send('pong');
+});
 io.on('connection', (socket) => {
     console.log('A user connected');
     

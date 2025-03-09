@@ -515,8 +515,64 @@ header button {
 ::selection {
     background-color: rgba(255, 51, 51, 0.3);
     color: #ffffff;
+}#image-input {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    background-color: #222222;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
+#image-input:hover {
+    border-color: #ff3333;
+    background-color: #2a2a2a;
+}
+
+#image-input:focus {
+    border-color: #ff3333;
+    box-shadow: 0 0 8px rgba(255, 51, 51, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    outline: none;
+}
+
+/* Image Container Styles for Proper Sizing */
+#roast-image {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain; /* This ensures image maintains aspect ratio */
+    display: block;
+    transition: transform 0.5s ease;
+    margin: 0 auto; /* Center image horizontally */
+    background-color: #111; /* Dark background for images with transparency */
+}
+
+/* Media query to handle smaller screens */
+@media (max-width: 767px) {
+    #roast-image {
+        max-height: 50vh; /* Slightly smaller on mobile */
+    }
+    
+    #image-input {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Add these styles to ensure proper image rendering in JavaScript */
+.image-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #111;
+}
 @media (prefers-reduced-motion: no-preference) {
     .form-container, #image-card, #comments-section {
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 

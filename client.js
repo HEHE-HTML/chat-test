@@ -4,7 +4,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DOM Elements
     // Auth elements
+    function startPing() {
+        setInterval(() => {
+            fetch('/ping') // Adjust the endpoint as needed
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Ping failed:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during ping:', error);
+                });
+        }, 5 * 60 * 500)// Ping every 5 minutes
+    }
 
+    startPing(); // Start the pinging process
+
+    // ... rest of your existing code
     const authContainer = document.getElementById('auth-container');
     const mainContainer = document.getElementById('main-container');
     const usernameInput = document.getElementById('username');
