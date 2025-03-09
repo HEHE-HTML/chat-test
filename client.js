@@ -3,25 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const socket = io();
 
     // DOM Elements
-    // Auth elements
+    // Ping function to keep connection alive
     function startPing() {
         setInterval(() => {
-            fetch('/ping') // Adjust the endpoint as needed
+            fetch('/ping')
                 .then(response => {
                     if (!response.ok) {
                         console.error('Ping failed:', response.status);
-                        
                     }
                 })
                 .catch(error => {
                     console.error('Error during ping:', error);
                 });
-        }, 5 * 60 * 500)// Ping every 5 minutes
+        }, 5 * 60 * 500); // Ping every 5 minutes
     }
 
     startPing(); // Start the pinging process
 
-    // ... rest of your existing code
+    // Auth elements
     const authContainer = document.getElementById('auth-container');
     const mainContainer = document.getElementById('main-container');
     const usernameInput = document.getElementById('username');
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set appropriate attributes for mobile vs desktop
     if (isMobile) {
         imageInput.setAttribute('accept', 'image/*');
-        imageInput.setAttribute('capture', 'camera'); // This triggers the camera on most mobile devices
+        imageInput.setAttribute('capture', 'environment'); // This specifies rear camera on mobile devices
     } else {
         imageInput.setAttribute('accept', 'image/*');
         // No capture attribute for desktop to ensure file browser opens
@@ -385,6 +384,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Upload functionality
     uploadBtn.addEventListener('click', () => {
         uploadModal.style.display = 'block';
+        
+        // On mobile, we'll add a direct camera button
+        if (isMobile && !document.getElementById('take-photo-btn')) {
+            const uploadForm = document.getElementById('upload-form');
+            const cameraButton = document.createElement('button');
+            cameraButton.id = 'take-photo-btn';
+            cameraButton.className = 'red-button';
+            cameraButton.type = 'button';
+            cameraButton.textContent = '📷 Take Photo';
+            cameraButton.style.marginRight = '10px';
+            cameraButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                imageInput.setAttribute('capture', 'environment');
+                imageInput.click();
+            });
+            
+            const galleryButton = document.createElement('button');
+            galleryButton.id = 'gallery-btn';
+            galleryButton.className = 'red-button';
+            galleryButton.type = 'button';
+            galleryButton.textContent = '📁 From Gallery';
+            galleryButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Remove capture attribute to open gallery instead of camera
+                imageInput.removeAttribute('capture');
+                imageInput.click();
+            });
+            
+            // Clear previous buttons if they exist
+            const existingButtons = uploadForm.querySelectorAll('button:not(#submit-image)');
+            existingButtons.forEach(btn => btn.remove());
+            
+            // Add buttons to form
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            buttonContainer.appendChild(cameraButton);
+            buttonContainer.appendChild(galleryButton);
+            
+            // Insert before the upload button
+            uploadForm.insertBefore(buttonContainer, submitImageBtn);
+            
+            // Hide the regular submit button on mobile
+            submitImageBtn.style.display = 'none';
+        }
     });
 
     closeModal.addEventListener('click', () => {
@@ -397,20 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Modified code to automatically trigger file input when submit button is clicked
-    submitImageBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // Check if a file has already been selected
-        if (imageInput.files.length > 0) {
-            // If file already selected, proceed with form submission
-            handleFileUpload();
-        } else {
-            // If no file selected, trigger the file input click
-            imageInput.click();
-        }
-    });
-    
     // Also add a change listener to automatically submit once a file is selected
     imageInput.addEventListener('change', (e) => {
         if (imageInput.files.length > 0) {
@@ -418,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Extract file upload logic to a separate function - MODIFIED to remove size limit
+    // Extract file upload logic to a separate function - MODIFIED to improve mobile handling
     function handleFileUpload() {
         const file = imageInput.files[0];
         if (!file) {
@@ -432,55 +461,86 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Size validation removed to allow any size
-        
         // Show loading indicator
-        const submitButton = uploadForm.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.textContent;
-        submitButton.textContent = 'Uploading...';
-        submitButton.disabled = true;
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'loading-indicator';
+        loadingIndicator.innerHTML = '<p>Uploading your image...</p><div class="spinner"></div>';
+        document.body.appendChild(loadingIndicator);
         
-        const reader = new FileReader();
+        // For mobile photos, check if we need to resize (optional but helps with large camera photos)
+        const maxDimension = 1200; // Reasonable max dimension that won't cause issues
         
-        reader.onload = function(event) {
-            try {
-                socket.emit('upload image', event.target.result);
+        // Create an image element to check dimensions and potentially resize
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Resize if necessary (for very large camera photos)
+            if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                    height = Math.round(height * (maxDimension / width));
+                    width = maxDimension;
+                } else {
+                    width = Math.round(width * (maxDimension / height));
+                    height = maxDimension;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Get the resized image as a data URL
+                const resizedDataURL = canvas.toDataURL(file.type || 'image/jpeg', 0.85);
+                
+                // Upload the resized image
+                socket.emit('upload image', resizedDataURL);
                 uploadModal.style.display = 'none';
-            } catch (error) {
-                console.error('Upload error:', error);
-                alert('Error uploading image. Please try again.');
-            } finally {
-                // Reset form and button state
-                imageInput.value = '';
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
+            } else {
+                // If no resize needed, just use the original reader result
+                readAndUploadImage(file);
             }
+            
+            // Reset form and clean up
+            imageInput.value = '';
+            URL.revokeObjectURL(objectURL);
         };
         
-        reader.onerror = function() {
-            console.error('FileReader error:', reader.error);
-            alert('Error reading file. Please try again.');
-            submitButton.textContent = originalButtonText;
-            submitButton.disabled = false;
+        // Handle errors in image loading
+        img.onerror = function() {
+            console.error('Error loading image for processing');
+            readAndUploadImage(file); // Fall back to regular upload
+            URL.revokeObjectURL(objectURL);
         };
         
-        // Increased timeout for large files
-        setTimeout(() => {
-            if (reader.readyState !== 2) { // DONE state
-                reader.abort();
-                alert('Upload timed out. The image might be too large to process.');
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
-            }
-        }, 120000); // Extended timeout to 2 minutes
+        // Load image from file for processing
+        const objectURL = URL.createObjectURL(file);
+        img.src = objectURL;
         
-        try {
+        // Helper function to read and upload unmodified image
+        function readAndUploadImage(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                try {
+                    socket.emit('upload image', event.target.result);
+                    uploadModal.style.display = 'none';
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('Error uploading image. Please try again.');
+                    loadingIndicator.remove();
+                }
+            };
+            
+            reader.onerror = function() {
+                console.error('FileReader error:', reader.error);
+                alert('Error reading file. Please try again.');
+                loadingIndicator.remove();
+            };
+            
             reader.readAsDataURL(file);
-        } catch (error) {
-            console.error('Error starting file read:', error);
-            alert('Could not process the selected file. Please try another image.');
-            submitButton.textContent = originalButtonText;
-            submitButton.disabled = false;
         }
     }
 
@@ -524,6 +584,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // If this is the first image, show it
         if (images.length === 1) {
             showImage(0);
+        }
+        
+        // Remove loading indicator if it exists
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+    });
+
+    socket.on('upload error', (message) => {
+        alert(`Upload failed: ${message}`);
+        
+        // Remove loading indicator if it exists
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.remove();
         }
     });
 
@@ -624,6 +700,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Touch-specific behavior for upload button
     uploadBtn.addEventListener('touchstart', () => {
-        uploadModal.style.display = 'block';
+        uploadBtn.classList.add('pressed');
+    });
+    
+    uploadBtn.addEventListener('touchend', () => {
+        uploadBtn.classList.remove('pressed');
     });
 });
