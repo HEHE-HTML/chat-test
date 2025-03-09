@@ -49,12 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close');
     const uploadForm = document.getElementById('upload-form');
     const imageInput = document.getElementById('image-input');
-    const submitImageBtn = document.getElementById('submit-image');
 
-    // Create notification container and add to body
+    // Create notification container and add to body (only for desktop)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const notificationContainer = document.createElement('div');
-    notificationContainer.id = 'notification-container';
-    document.body.appendChild(notificationContainer);
+    
+    if (!isMobile) {
+        notificationContainer.id = 'notification-container';
+        document.body.appendChild(notificationContainer);
+    }
 
     // App state
     let userStats = {
@@ -127,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     commentForm.insertBefore(charCounterContainer, commentForm.firstChild);
 
     // Detect if running on mobile device
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     // Set appropriate attributes for mobile vs desktop
     if (isMobile) {
@@ -186,8 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Notification function
+    // Notification function - only for desktop
     function showNotification(title, message, imageId, commentId) {
+        if (isMobile) return; // Skip notifications on mobile
+        
         const notification = document.createElement('div');
         notification.className = 'notification';
         notification.dataset.imageId = imageId;
@@ -293,7 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
         myImages.clear(); // Clear tracked images when logging out
         
         // Clear any notifications
-        notificationContainer.innerHTML = '';
+        if (!isMobile && notificationContainer) {
+            notificationContainer.innerHTML = '';
+        }
     });
 
     // Image navigation
@@ -382,52 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Upload functionality
-    uploadBtn.addEventListener('click', () => {
+    uploadBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent any default form submission
         uploadModal.style.display = 'block';
-        
-        // On mobile, we'll add a direct camera button
-        if (isMobile && !document.getElementById('take-photo-btn')) {
-            const uploadForm = document.getElementById('upload-form');
-            const cameraButton = document.createElement('button');
-            cameraButton.id = 'take-photo-btn';
-            cameraButton.className = 'red-button';
-            cameraButton.type = 'button';
-            cameraButton.textContent = '📷 Take Photo';
-            cameraButton.style.marginRight = '10px';
-            cameraButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                imageInput.setAttribute('capture', 'environment');
-                imageInput.click();
-            });
-            
-            const galleryButton = document.createElement('button');
-            galleryButton.id = 'gallery-btn';
-            galleryButton.className = 'red-button';
-            galleryButton.type = 'button';
-            galleryButton.textContent = '📁 From Gallery';
-            galleryButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Remove capture attribute to open gallery instead of camera
-                imageInput.removeAttribute('capture');
-                imageInput.click();
-            });
-            
-            // Clear previous buttons if they exist
-            const existingButtons = uploadForm.querySelectorAll('button:not(#submit-image)');
-            existingButtons.forEach(btn => btn.remove());
-            
-            // Add buttons to form
-            const buttonContainer = document.createElement('div');
-            buttonContainer.className = 'button-container';
-            buttonContainer.appendChild(cameraButton);
-            buttonContainer.appendChild(galleryButton);
-            
-            // Insert before the upload button
-            uploadForm.insertBefore(buttonContainer, submitImageBtn);
-            
-            // Hide the regular submit button on mobile
-            submitImageBtn.style.display = 'none';
-        }
     });
 
     closeModal.addEventListener('click', () => {
@@ -447,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Extract file upload logic to a separate function - MODIFIED to improve mobile handling
+    // Extract file upload logic to a separate function
     function handleFileUpload() {
         const file = imageInput.files[0];
         if (!file) {
@@ -460,12 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please select an image file (JPEG, PNG, etc.)');
             return;
         }
-        
-        // Show loading indicator
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.className = 'loading-indicator';
-        loadingIndicator.innerHTML = '<p>Uploading your image...</p><div class="spinner"></div>';
-        document.body.appendChild(loadingIndicator);
         
         // For mobile photos, check if we need to resize (optional but helps with large camera photos)
         const maxDimension = 1200; // Reasonable max dimension that won't cause issues
@@ -530,14 +487,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (error) {
                     console.error('Upload error:', error);
                     alert('Error uploading image. Please try again.');
-                    loadingIndicator.remove();
                 }
             };
             
             reader.onerror = function() {
                 console.error('FileReader error:', reader.error);
                 alert('Error reading file. Please try again.');
-                loadingIndicator.remove();
             };
             
             reader.readAsDataURL(file);
@@ -585,22 +540,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (images.length === 1) {
             showImage(0);
         }
-        
-        // Remove loading indicator if it exists
-        const loadingIndicator = document.querySelector('.loading-indicator');
-        if (loadingIndicator) {
-            loadingIndicator.remove();
-        }
     });
 
     socket.on('upload error', (message) => {
         alert(`Upload failed: ${message}`);
-        
-        // Remove loading indicator if it exists
-        const loadingIndicator = document.querySelector('.loading-indicator');
-        if (loadingIndicator) {
-            loadingIndicator.remove();
-        }
     });
 
     socket.on('comments', (comments) => {
@@ -643,8 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMyImage = myImages.has(comment.imageId);
         const isMyComment = comment.username === currentUsername;
         
-        // Show notification if it's my image but not my comment
-        if (isMyImage && !isMyComment) {
+        // Show notification if it's my image but not my comment (desktop only)
+        if (!isMobile && isMyImage && !isMyComment) {
             const commentPreview = comment.text.length > 30 ? 
                 `${comment.text.substring(0, 30)}...` : comment.text;
             
