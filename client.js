@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(error => {
                     console.error('Error during ping:', error);
                 });
-        }, 60 * 300); // Ping every 1 minute
+        }, 30000); // Ping every 6 SECONDs
     }
 
     startPing(); // Start the pinging process
