@@ -333,8 +333,9 @@ header button {
     background-color: #1a1a1a;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    padding: 25px;
+    padding: 25px; /* Keep consistent padding */
     border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 550px; /* Adjust height to fit more comments */
 }
 
 #comments-section h3 {
@@ -346,14 +347,14 @@ header button {
 }
 
 .choose-file {
-    
+    /* Add any specific styles for the choose file button here */
 }
 
 #comments-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    max-height: 500px;
+    max-height: 400px; /* Adjust this value based on your comment height */
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #444 #222;

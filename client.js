@@ -382,7 +382,13 @@ const availableBadges = [
             alert('Please select an image to upload');
             return;
         }
-
+    
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size exceeds 5MB. Please choose a smaller image.');
+            return;
+        }
+    
         const reader = new FileReader();
         reader.onloadend = () => {
             socket.emit('upload image', reader.result);
